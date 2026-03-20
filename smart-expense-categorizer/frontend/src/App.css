@@ -104,6 +104,42 @@ input {
   display: none;
 }
 
+.auth-box {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-box input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.auth-mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mode-active {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0f766e, #2563eb) !important;
+}
+
+.auth-state {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
 .upload-panel button {
   border: none;
   border-radius: 16px;

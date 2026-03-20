@@ -1,110 +1,93 @@
-# Smart Expense Categorizer
+# Smart Expense Categorizer (Firebase Edition)
 
-Smart Expense Categorizer is a full-stack web app that reads a bank statement CSV, assigns each transaction to a spending category using keyword matching, and visualizes the results in a clean dashboard.
+This version uses Firebase as the backend platform:
+- Firebase Authentication for login and signup
+- Cloud Firestore for saving processed uploads per user
+- Client-side CSV parsing and categorization in React
 
 ## Features
 
-- Upload a CSV file with `Date`, `Merchant`, and `Amount` columns
-- Automatically categorize merchants into Food, Transport, Shopping, Groceries, Entertainment, Utilities, or Others
-- View category-wise spending summary cards in Indian Rupees
-- See a pie chart breakdown with consistent category colors
-- Browse every processed transaction in a responsive table
-- Get clear error messages for invalid file types, empty files, and malformed CSVs
-- Download a sample CSV and reset the dashboard from the UI
+- Email/password authentication
+- Upload a CSV file with `Date`, `Merchant`, and `Amount`
+- Automatic category tagging (Food, Transport, Shopping, Groceries, Entertainment, Utilities, Others)
+- Summary cards with INR formatting
+- Pie chart and full transaction table
+- Saves each analyzed upload in Firestore for the signed-in user
+- Automatically loads the latest saved upload on sign-in
 
 ## Project Structure
 
 ```text
 smart-expense-categorizer/
-├── backend/
-│   ├── app.py
-│   └── requirements.txt
-├── frontend/
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   └── src/
-│       ├── App.css
-│       ├── App.jsx
-│       └── main.jsx
-└── README.md
+|-- backend/
+|   |-- app.py
+|   `-- requirements.txt
+|-- frontend/
+|   |-- .env.example
+|   |-- index.html
+|   |-- package.json
+|   |-- vite.config.js
+|   `-- src/
+|       |-- App.css
+|       |-- App.jsx
+|       |-- firebase.js
+|       `-- main.jsx
+`-- README.md
 ```
 
-## Backend Setup
+## Firebase Setup
 
-1. Open a terminal in `smart-expense-categorizer/backend`.
-2. Create and activate a virtual environment.
+1. In Firebase Console, create or select your project.
+2. Enable Authentication:
+   - Open `Authentication` -> `Sign-in method`
+   - Enable `Email/Password`
+3. Create Firestore database.
+4. Register a Web App and copy Firebase config values.
+5. In `frontend`, create `.env` from `.env.example`.
 
-```bash
-python -m venv venv
-venv\Scripts\activate
+```powershell
+cd frontend
+Copy-Item .env.example .env
 ```
 
-3. Install dependencies.
+6. Fill `.env`:
 
-```bash
-pip install -r requirements.txt
-```
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
 
-4. Start the Flask server.
+## Run Locally
 
-```bash
-python app.py
-```
-
-The API will run on `http://127.0.0.1:5000`.
-
-Optional quick API check:
-
-```bash
-curl http://127.0.0.1:5000/health
-```
-
-## Frontend Setup
-
-1. Open a second terminal in `smart-expense-categorizer/frontend`.
-2. Install dependencies.
-
-```bash
+```powershell
+cd frontend
 npm install
-```
-
-3. Start the React development server.
-
-```bash
 npm run dev
 ```
 
-The frontend will run on `http://127.0.0.1:5173`.
+Frontend runs on `http://127.0.0.1:5173`.
 
-## Using the App
+## Deploy on Vercel
 
-1. Open the frontend in your browser.
-2. Click `Download Sample` if you want a ready-made CSV to test with.
-3. Choose a `.csv` file and click `Upload & Analyze`.
-4. Review the summary cards, pie chart, and transaction table.
-5. Click `Reset` to clear the dashboard and upload another file.
+1. Import repo in Vercel.
+2. Set Root Directory to `frontend`.
+3. Add all `VITE_FIREBASE_*` env variables in Vercel Project Settings.
+4. Redeploy.
 
-## API
+## Firestore Rules (starter)
 
-### `POST /upload`
+Use owner-only rules so each user can only access their own uploads:
 
-Accepts a multipart form upload with a `file` field containing a CSV.
-
-Successful response shape:
-
-```json
-{
-  "transactions": [
-    {
-      "date": "01-03-2026",
-      "merchant": "Swiggy",
-      "amount": 450,
-      "category": "Food"
+```txt
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /expenseUploads/{docId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.uid;
     }
-  ],
-  "summary": {
-    "Food": 450
   }
 }
 ```
@@ -119,9 +102,3 @@ Date,Merchant,Amount
 04-03-2026,Big Bazaar,980
 05-03-2026,Netflix,499
 ```
-
-## Notes
-
-- Categorization uses case-insensitive partial keyword matching.
-- The app processes data in memory for each session and does not require a database.
-- CORS is enabled in the Flask app for local frontend development.
