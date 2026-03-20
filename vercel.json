@@ -1,0 +1,6 @@
+{
+  "framework": "vite",
+  "installCommand": "cd smart-expense-categorizer/frontend && npm install",
+  "buildCommand": "cd smart-expense-categorizer/frontend && npm run build",
+  "outputDirectory": "smart-expense-categorizer/frontend/dist"
+}

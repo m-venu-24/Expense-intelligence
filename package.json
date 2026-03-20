@@ -1,0 +1,8 @@
+{
+  "name": "expense-intelligence-repo-root",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd smart-expense-categorizer/frontend && npm install && npm run build"
+  }
+}
